@@ -1,0 +1,1009 @@
+<!doctype html><html><head><meta charset=utf8><meta name="robots" content="noindex,nofollow"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Fares to Japan &amp; Korea</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@500&display=swap">
+<style>
+/* Layout: cabin switch up top, then best picks and one filterable fare table for the chosen cabin */
+:root {
+  --bg: #d6cab6; --surface: #f4efe7; --fg: #3b3128; --muted: #6e6254; --line: #bfb29b;
+  --accent: #8c6a3f; --accent-soft: #e8dcc6; --on-accent: #ffffff; --good: #5a6b45; --good-soft: #e0e4d0;
+  --warn: #8a5a2b; --warn-soft: #f0e0c8; --over: #a14a35;
+  --display: "Roboto", "Segoe UI", system-ui, sans-serif;
+  --body: "Roboto", "Segoe UI", system-ui, sans-serif;
+  --mono: "Roboto Mono", ui-monospace, Consolas, monospace;
+}
+body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 56px; }
+.wrap { max-width: 1060px; margin: 0 auto; display: grid; gap: 32px; }
+h1, h2 { font-family: var(--display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5.5vw, 48px); line-height: 1.1; font-weight: 300; }
+h2 { font-size: 24px; font-weight: 300; }
+p { margin: 0; }
+header { display: grid; gap: 14px; }
+.lede { color: var(--muted); max-width: 70ch; }
+.criteria { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-size: 13px; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); }
+section { display: grid; gap: 14px; }
+.section-note { color: var(--muted); max-width: 74ch; }
+
+.cabin { display: inline-flex; padding: 4px; gap: 4px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); justify-self: start; }
+.cabin button { font: 600 15px var(--body); color: var(--muted); background: none; border: 0; border-radius: 9px; padding: 9px 18px; cursor: pointer; }
+.cabin button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.cabin button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.picks { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.pick { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 8px; align-content: start; }
+.pick .tag { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.pick .route { font-family: var(--mono); font-size: 19px; }
+.pick .price { font-family: var(--display); font-size: 32px; font-weight: 300; line-height: 1; }
+.pick .meta { color: var(--muted); font-size: 13.5px; }
+.pick a { font-size: 13.5px; color: var(--accent); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { font: 500 13.5px var(--body); color: var(--muted); background: none; border: 0; padding: 6px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+.seg button:focus-visible, .toggle input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.toggle { display: inline-flex; gap: 6px; align-items: center; font-size: 13.5px; color: var(--muted); }
+.toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+.count { margin-left: auto; color: var(--muted); font-size: 13px; }
+
+.table-box { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+table { width: 100%; border-collapse: collapse; min-width: 780px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+td.amt, th.amt { text-align: right; }
+td.amt { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 15.5px; }
+.sub { color: var(--muted); font-size: 13px; }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.full { background: var(--good-soft); color: var(--good); }
+.mixed { background: var(--warn-soft); color: var(--warn); }
+.eco { background: var(--accent-soft); color: var(--accent); }
+.s0 { background: var(--good-soft); color: var(--good); }
+.s1 { background: var(--accent-soft); color: var(--accent); }
+.s2 { background: var(--warn-soft); color: var(--warn); }
+.long { color: var(--warn); font-size: 12.5px; }
+.overby { color: var(--over); font-size: 12.5px; }
+td a { color: var(--accent); font-size: 13px; white-space: nowrap; }
+.empty { color: var(--muted); }
+
+.notes { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; }
+.notes ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; color: var(--muted); max-width: 80ch; }
+.notes strong { color: var(--fg); }
+</style>
+
+<style>
+.selectors { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+.sel { display: grid; gap: 4px; max-width: 100%; }
+.sel-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.cabin { flex-wrap: wrap; max-width: 100%; }
+.cabin button { flex: 1 1 auto; }
+@media (max-width: 480px) { .cabin button { padding: 9px 12px; font-size: 14px; } }
+:root { --bad-soft: #efd9cd; --typ-soft: #e6dfd1; }
+.lv { display: inline-block; padding: 1px 8px; border-radius: 6px; font-weight: 500; border: 1px solid transparent; }
+.lv-l { background: #bfe0a6; color: #1f4a12; border-color: #8fc06b; }
+.lv-t { background: #d3dde2; color: #26404d; border-color: #a3b7c1; }
+.lv-h { background: #f3b9a6; color: #7a1f0c; border-color: #dd8a70; }
+.legend { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.legend .lv { font-size: 12px; padding: 0 8px; }
+.flag { width: 21px; height: 14px; vertical-align: -2px; border: 1px solid var(--line); border-radius: 2px; margin-right: 2px; }
+.pick .route .flag { width: 26px; height: 17px; vertical-align: -1px; margin-right: 4px; }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="f-jp" viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="6" fill="#bc002d"/></symbol>
+<symbol id="f-kr" viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><path d="M10 10a5 5 0 0 1 10 0z" fill="#cd2e3a"/><path d="M10 10a5 5 0 0 0 10 0z" fill="#0047a0"/><g fill="#000"><g transform="translate(5.5 4) rotate(-35)"><rect x="-2.5" y="-1.6" width="5" height="0.9"/><rect x="-2.5" y="-0.45" width="5" height="0.9"/><rect x="-2.5" y="0.7" width="5" height="0.9"/></g><g transform="translate(24.5 4) rotate(35)"><rect x="-2.5" y="-1.6" width="5" height="0.9"/><rect x="-2.5" y="-0.45" width="5" height="0.9"/><rect x="-2.5" y="0.7" width="5" height="0.9"/></g><g transform="translate(5.5 16) rotate(35)"><rect x="-2.5" y="-1.6" width="5" height="0.9"/><rect x="-2.5" y="-0.45" width="5" height="0.9"/><rect x="-2.5" y="0.7" width="5" height="0.9"/></g><g transform="translate(24.5 16) rotate(-35)"><rect x="-2.5" y="-1.6" width="5" height="0.9"/><rect x="-2.5" y="-0.45" width="5" height="0.9"/><rect x="-2.5" y="0.7" width="5" height="0.9"/></g></g></symbol></defs></svg>
+<div class="wrap">
+  <header>
+    <h1 id="h1"></h1>
+    <div class="selectors">
+      <div class="sel">
+        <span class="sel-label">Season</span>
+        <div class="cabin" role="group" aria-label="Season" id="f-season">
+          <button data-v="winter" aria-pressed="true">Winter</button>
+          <button data-v="spring" aria-pressed="false">Spring</button>
+          <button data-v="summer" aria-pressed="false">Summer</button>
+        </div>
+      </div>
+      <div class="sel">
+        <span class="sel-label">Cabin</span>
+        <div class="cabin" role="group" aria-label="Cabin" id="f-cabin">
+          <button data-v="eco" aria-pressed="true">Economy</button>
+          <button data-v="pe" aria-pressed="false">Premium economy</button>
+          <button data-v="bus" aria-pressed="false">Business</button>
+        </div>
+      </div>
+    </div>
+    <p class="lede" id="lede"></p>
+    <div class="criteria" id="chips"></div>
+  </header>
+
+  <section>
+    <h2>Best picks</h2>
+    <p class="section-note" id="picks-note"></p>
+    <div class="picks" id="picks"></div>
+  </section>
+
+  <section>
+    <h2>All fares found</h2>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Destination" id="f-dest">
+        <button data-v="all" aria-pressed="true">All</button>
+        <button data-v="Japan" aria-pressed="false">Japan</button>
+        <button data-v="Korea" aria-pressed="false">Korea</button>
+      </div>
+      <div class="seg" role="group" aria-label="Departure airport" id="f-from">
+        <button data-v="all" aria-pressed="true">All airports</button>
+        <button data-v="LAX" aria-pressed="false">LAX</button>
+        <button data-v="SAN" aria-pressed="false">SAN</button>
+        <button data-v="SNA" aria-pressed="false">SNA</button>
+        <button data-v="ONT" aria-pressed="false">ONT</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="f-nonstop"> Nonstop only</label>
+      <label class="toggle" id="full-wrap" hidden><input type="checkbox" id="f-full"> <span id="full-label"></span></label>
+      <label class="toggle"><input type="checkbox" id="f-budget" checked> Under $4,000</label>
+      <span class="count" id="count"></span>
+    </div>
+    <p class="legend" id="legend"></p>
+    <div class="table-box">
+      <table>
+        <thead><tr><th>Dates</th><th>Route</th><th>Airline</th><th>Stops</th><th>Outbound</th><th>Cabin</th><th class="amt">Price</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="notes">
+    <h2>Before you book</h2>
+    <ul id="notes"></ul>
+  </div>
+</div>
+
+<script>
+const SEASONS = {
+  winter: { name: "Winter", chips: ["Depart after Dec 17", "Return before Jan 3", "10+ days"], D: {
+    a: { label: "Dec 18 – Jan 2", days: 15, d: "2026-12-18", r: "2027-01-02" },
+    b: { label: "Dec 20 – Dec 31", days: 11, d: "2026-12-20", r: "2026-12-31" },
+    c: { label: "Dec 22 – Jan 2", days: 11, d: "2026-12-22", r: "2027-01-02" } } },
+  spring: { name: "Spring", chips: ["Leave after Mar 18", "Return before Mar 28", "6+ days"], D: {
+    a: { label: "Mar 19 – Mar 25", days: 6, d: "2027-03-19", r: "2027-03-25" },
+    b: { label: "Mar 20 – Mar 27", days: 7, d: "2027-03-20", r: "2027-03-27" },
+    c: { label: "Mar 21 – Mar 27", days: 6, d: "2027-03-21", r: "2027-03-27" } } },
+  summer: { name: "Summer", chips: ["Leave after May 30", "Return before Aug 6", "10+ days"], D: {
+    a: { label: "Jun 1 – Jun 11", days: 10, d: "2027-06-01", r: "2027-06-11" },
+    b: { label: "Jun 15 – Jun 25", days: 10, d: "2027-06-15", r: "2027-06-25" },
+    c: { label: "Jul 6 – Jul 16", days: 10, d: "2027-07-06", r: "2027-07-16" },
+    d: { label: "Jul 20 – Aug 2", days: 13, d: "2027-07-20", r: "2027-08-02" } } }
+};
+const CAB = {
+  eco: { name: "economy", code: 1, hash: "economy" },
+  pe: { name: "premium economy", code: 2, hash: "premium" },
+  bus: { name: "business", code: 3, hash: "business" }
+};
+const DEST = {
+  TYO: ["Tokyo", "Japan", "/m/07dfk"], HND: ["Tokyo Haneda", "Japan", "/m/07dfk"], NRT: ["Tokyo Narita", "Japan", "/m/07dfk"],
+  KIX: ["Osaka", "Japan", "KIX"], ICN: ["Seoul", "Korea", "ICN"]
+};
+
+// Google Flights link with the right cabin already selected (1 = economy, 2 = premium economy, 3 = business)
+const enc = s => [...new TextEncoder().encode(s)];
+const fld = (tag, b) => [tag, b.length, ...b];
+const place = c => c.startsWith("/m/") ? [8, 2, ...fld(0x12, enc(c))] : [8, 1, ...fld(0x12, enc(c))];
+const leg = (d, f, t) => fld(0x1a, [...fld(0x12, enc(d)), ...fld(0x6a, place(f)), ...fld(0x72, place(t))]);
+function link(f, cabin, season) {
+  const d = SEASONS[season].D[f.dk], to = DEST[f.to][2];
+  const tail = [0x40, 1, 0x48, CAB[cabin].code, 0x70, 1, 0x82, 1, 0x0b, 0x08, 255, 255, 255, 255, 255, 255, 255, 255, 255, 1, 0x98, 1, 1];
+  const b = [8, 0x1c, 0x10, 2, ...leg(d.d, f.from, to), ...leg(d.r, to, f.from), ...tail];
+  return "https://www.google.com/travel/flights/search?tfs=" + btoa(String.fromCharCode(...b)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") + "&hl=en&curr=USD";
+}
+const row = ([dk, from, to, airline, stops, via, time, dur, price, full = true]) => ({ dk, from, to, airline, stops, via, time, dur, price, full, country: DEST[to][1] });
+
+// [dates, from, to, airline, stops, via, outbound, duration, price]
+const ECO = [
+  ["c","LAX","NRT","Korean Air",1,"ICN","11:00a → 9:25p +1","17h 25m",2184],
+  ["c","LAX","NRT","Asiana / Korean Air",1,"ICN","9:00a → 7:30p +1","17h 30m",2282],
+  ["c","LAX","HND","Delta",0,"","10:15a → 3:20p +1","12h 5m",2294],
+  ["c","LAX","NRT","Asiana",1,"ICN","9:00a → 8:20p +1","18h 20m",2334],
+  ["c","LAX","NRT","Asiana",1,"ICN","11:50p → 5:55p +2","25h 5m",2334],
+  ["c","LAX","ICN","Air Premia",0,"","9:50a → 4:20p +1","13h 30m",2444],
+  ["c","LAX","ICN","Asiana",0,"","9:00a → 3:35p +1","13h 35m",2583],
+  ["c","LAX","ICN","Asiana",0,"","11:50p → 6:10a +2","13h 20m",2583],
+  ["c","LAX","ICN","Finnair",1,"HEL","6:50p → 12:25p +2","24h 35m",2677],
+  ["c","LAX","ICN","Alaska / Korean Air",1,"SEA","7:45p → 5:20a +2","16h 35m",3182],
+  ["b","LAX","TYO","United",2,"HNL, GUM","5:05p → 10:50p +2","36h 45m",1848],
+  ["b","LAX","TYO","United / ANA",1,"SEA","8:47p → 7:15p +2","29h 28m",1867],
+  ["b","LAX","NRT","United / ANA",1,"HNL","5:05p → 3:45p +2","29h 40m",2004],
+  ["b","LAX","NRT","United",0,"","11:05a → 3:55p +1","11h 50m",2639],
+  ["b","LAX","NRT","ANA",0,"","11:30a → 4:30p +1","12h",2501],
+  ["b","LAX","TYO","ANA",0,"","12:10a → 5:30a +1","12h 20m",2484],
+  ["b","LAX","KIX","Asiana / Korean Air",1,"ICN","9:00a → 8:45p +1","18h 45m",2022],
+  ["b","LAX","KIX","Asiana / Korean Air",1,"ICN","11:50p → 5:00p +2","24h 10m",2022],
+  ["b","LAX","KIX","Asiana",1,"ICN","9:00a → 6:30p +1","16h 30m",2054],
+  ["b","LAX","KIX","Asiana",1,"ICN","11:50p → 9:15a +2","16h 25m",2054],
+  ["b","LAX","KIX","Asiana",1,"","11:50p → 7:00p +2","26h 10m",2373],
+  ["b","LAX","KIX","JAL",0,"","1:30p → 7:10p +1","12h 40m",2869],
+  ["b","LAX","NRT","Asiana",1,"ICN","11:50p → 11:20a +2","18h 30m",2360],
+  ["b","LAX","NRT","Asiana",1,"ICN","9:00a → 8:20p +1","18h 20m",2360],
+  ["b","LAX","ICN","American / Finnair",2,"MIA, HEL","9:25p → 12:25p +3","46h",2288],
+  ["b","LAX","ICN","Air Premia",0,"","9:50a → 4:20p +1","13h 30m",2469],
+  ["b","LAX","ICN","United",1,"SFO","10:32p → 4:15p +2","24h 43m",2509],
+  ["b","LAX","ICN","Korean Air",0,"","10:00p → 4:20a +2","13h 20m",2646],
+  ["b","LAX","ICN","Korean Air",0,"","11:00a → 5:35p +1","13h 35m",2646],
+  ["a","LAX","HND","Delta",1,"HNL","8:10a → 6:45p +1","17h 35m",2348],
+  ["a","LAX","NRT","Korean Air",1,"ICN","11:00a → 9:25p +1","17h 25m",2657],
+  ["a","LAX","HND","United",2,"HNL, GUM","9:00a → 10:50p +1","20h 50m",2925],
+  ["a","LAX","NRT","ANA",0,"","11:30a → 4:30p +1","12h",3308],
+  ["a","LAX","NRT","United",0,"","11:05a → 3:55p +1","11h 50m",3351],
+  ["a","LAX","HND","United",0,"","11:30a → 4:30p +1","12h",3373],
+  ["a","LAX","HND","American",0,"","9:55a → 3:05p +1","12h 10m",3448],
+  ["a","LAX","HND","Delta",0,"","10:15a → 3:20p +1","12h 5m",3545],
+  ["a","LAX","KIX","Korean Air",1,"ICN","11:00a → 10:40p +1","18h 40m",2660],
+  ["a","LAX","KIX","Alaska",1,"HNL","8:05a → 6:45p +1","17h 40m",2755],
+  ["a","LAX","KIX","Alaska",1,"HNL","5:10p → 6:45p +2","32h 35m",3215],
+  ["a","LAX","KIX","China Airlines",1,"TPE","10:40p → 1:20p +2","21h 40m",3358],
+  ["a","LAX","ICN","Air Premia",0,"","9:50a → 4:20p +1","13h 30m",3194],
+  ["a","LAX","ICN","EVA Air",1,"TPE","10:40a → 10:30a +2","30h 50m",3325],
+  ["a","LAX","ICN","Air Premia",0,"","10:30p → 4:50a +2","13h 20m",3419],
+  ["a","LAX","ICN","United",1,"SFO","7:11a → 4:15p +1","16h 4m",3442],
+  ["a","LAX","ICN","Asiana",0,"","9:00a → 3:35p +1","13h 35m",3740],
+  ["a","SAN","NRT","United",1,"LAX","6:20a → 3:55p +1","16h 35m",3041],
+  ["a","SAN","NRT","JAL",0,"","11:45a → 4:45p +1","12h",3082],
+  ["a","SAN","HND","United / ANA",2,"LAX, YVR","6:20a → 6:55p +1","19h 35m",3109],
+  ["a","SAN","NRT","United / ANA",1,"LAX","6:20a → 4:30p +1","17h 10m",3240],
+  ["a","SAN","NRT","United",1,"DEN","6:45a → 3:35p +1","15h 50m",3284],
+  ["a","SAN","ICN","Air Canada",1,"YVR","5:00p → 5:10p +2","31h 10m",3440],
+  ["a","SAN","ICN","United",1,"SFO","7:25a → 4:15p +1","15h 50m",3484],
+  ["a","SAN","ICN","Alaska / China Airlines",2,"SFO, TPE","6:49p → 11:20a +2","23h 31m",3618],
+  ["a","SAN","ICN","United",1,"SFO","7:43p → 5:40a +2","16h 57m",3930],
+  ["a","SNA","NRT","Alaska / JAL",1,"SEA","6:45a → 3:30p +1","15h 45m",4263],
+  ["a","SNA","HND","United / ANA",2,"SFO, SEA","9:29a → 7:15p +1","16h 46m",4249],
+  ["a","SNA","ICN","United",1,"SFO","7:00a → 4:15p +1","16h 15m",3418],
+  ["a","SNA","ICN","United",1,"SFO","7:10p → 5:40a +2","17h 30m",3930],
+  ["a","SNA","ICN","Delta / Korean Air",1,"SEA","7:00a → 3:55p +1","15h 55m",3979],
+  ["a","ONT","HND","Delta",2,"SLC, HNL","1:11p → 6:45p +2","36h 34m",2818],
+  ["a","ONT","HND","Alaska",1,"HNL","7:20a → 7:30p +1","19h 10m",3610],
+  ["a","ONT","HND","Alaska",1,"HNL","7:20a → 5:15p +1","16h 55m",3710],
+  ["a","ONT","TYO","Alaska / Philippine Airlines",2,"HNL, MNL","7:20a → 8:00a +3","55h 40m",3735],
+  ["a","ONT","NRT","American / JAL",2,"PHX, LAX","6:00a → 4:40p +1","17h 40m",3785],
+  ["a","ONT","ICN","United",1,"SFO","6:00a → 4:15p +1","17h 15m",3452],
+  ["a","ONT","ICN","Alaska / Philippine Airlines",2,"HNL, MNL","7:20a → 6:05a +3","53h 45m",3511],
+  ["a","ONT","ICN","Delta / Korean Air",1,"SEA","7:00a → 3:55p +1","15h 55m",3979],
+  ["a","ONT","ICN","United",1,"SFO","4:00p → 5:40a +2","20h 40m",3981]
+].map(row);
+
+// Same columns, plus whether every flight is premium economy
+const PE = [
+  ["c","LAX","HND","United",0,"","11:30a → 4:30p +1","12h",3979,true],
+  ["c","LAX","HND","ANA",0,"","3:45p → 9:05p +1","12h 20m",3279,true],
+  ["c","LAX","NRT","United",0,"","11:05a → 3:55p +1","11h 50m",3748,true],
+  ["c","LAX","NRT","ANA",0,"","11:30a → 4:30p +1","12h",3975,true],
+  ["c","LAX","NRT","JAL",0,"","11:50a → 4:40p +1","11h 50m",3383,true],
+  ["c","LAX","TYO","Alaska / JAL",2,"SFO, SAN","6:00a → 4:45p +1","17h 45m",2917,false],
+  ["c","LAX","TYO","United / ANA",1,"YVR","8:17a → 6:55p +1","17h 38m",3979,false],
+  ["c","LAX","HND","Philippine Airlines",1,"MNL","11:10a → 2:10p +2","34h",4303,false],
+  ["b","LAX","NRT","United / ANA",1,"HNL","5:05p → 3:45p +2","29h 40m",3129,false],
+  ["b","LAX","NRT","United / ANA",1,"HNL","6:45p → 3:45p +2","28h",3260,false],
+  ["b","LAX","NRT","WestJet",1,"YYC","7:00a → 4:30p +1","16h 30m",4284,true],
+  ["b","LAX","NRT","United",0,"","11:05a → 3:55p +1","11h 50m",4835,true],
+  ["b","LAX","HND","United",0,"","11:30a → 4:30p +1","12h",5334,true],
+  ["b","LAX","HND","ANA",0,"","3:45p → 9:05p +1","12h 20m",5557,true],
+  ["a","LAX","HND","United",2,"HNL, GUM","9:00a → 10:50p +1","20h 50m",3458,false],
+  ["a","LAX","NRT","ANA",0,"","11:30a → 4:30p +1","12h",4029,true],
+  ["a","LAX","NRT","United / ANA",1,"HNL","6:45p → 3:45p +2","28h",4051,false],
+  ["a","LAX","NRT","JAL",0,"","11:50a → 4:40p +1","11h 50m",6930,true],
+  ["b","LAX","KIX","Philippine Airlines",1,"MNL","11:10a → 7:55a +2","27h 45m",3499,false],
+  ["b","LAX","KIX","United",1,"SFO","10:32p → 4:45p +2","25h 13m",3838,false],
+  ["b","LAX","KIX","EVA Air",1,"TPE","10:35p → 9:55a +2","18h 20m",4990,false],
+  ["c","LAX","KIX","China Airlines",1,"TPE","10:40p → 11:35a +2","19h 55m",4284,false],
+  ["a","LAX","KIX","ANA",1,"Tokyo","11:30a → 9:50p +1","17h 20m",5791,false],
+  ["a","LAX","KIX","JAL / Jetstar",1,"NRT","11:50a → 8:25p +1","15h 35m",6942,false],
+  ["c","LAX","ICN","Finnair",1,"HEL","6:50p → 12:25p +2","24h 35m",2827,true],
+  ["c","LAX","ICN","Air Premia",0,"","9:50a → 4:20p +1","13h 30m",4859,true],
+  ["b","LAX","ICN","Philippine Airlines",1,"MNL","11:10a → 6:05a +2","25h 55m",3327,false],
+  ["b","LAX","ICN","United",1,"SFO","10:32p → 4:15p +2","24h 43m",4729,false],
+  ["b","LAX","ICN","United",1,"SFO","7:25a → 4:15p +1","15h 50m",4779,false],
+  ["a","LAX","ICN","Air Premia",0,"","9:50a → 4:20p +1","13h 30m",6234,true],
+  ["a","LAX","ICN","Cathay Pacific",1,"HKG","11:05a → 12:40a +2","20h 35m",7762,false],
+  ["c","SAN","TYO","United / ANA",2,"SFO, LAX","7:43p → 4:30p +2","27h 47m",3721,false],
+  ["c","SAN","TYO","United / ANA",1,"LAX","4:45p → 4:30p +2","30h 45m",3728,false],
+  ["b","SAN","TYO","United / ANA",2,"SFO, SEA","7:25a → 7:15p +1","18h 50m",4201,false],
+  ["b","SAN","NRT","United",2,"SFO, LAX","7:43p → 3:55p +2","27h 12m",4217,false],
+  ["b","SAN","ICN","Alaska / Philippine Airlines",2,"HNL, MNL","5:56p → 6:05a +3","43h 9m",3403,false],
+  ["b","SAN","ICN","Delta",1,"SEA","6:45p → 5:45p +2","30h",4572,false],
+  ["b","SAN","ICN","Delta",1,"SEA","7:36a → 5:45p +1","17h 9m",4614,false],
+  ["b","SNA","NRT","Alaska / JAL",1,"SFO","8:30p → 4:00p +2","26h 30m",2830,false],
+  ["b","SNA","NRT","Alaska / JAL",1,"SFO","7:01p → 4:00p +2","27h 59m",2830,false],
+  ["b","SNA","NRT","Alaska / JAL",1,"SEA","5:57p → 3:30p +2","28h 33m",2840,false],
+  ["b","SNA","TYO","Alaska / JAL",1,"SFO","7:45a → 5:20p +1","16h 35m",3288,false],
+  ["b","SNA","TYO","American / JAL",1,"DFW","6:37p → 3:25p +2","27h 48m",3807,false],
+  ["b","SNA","ICN","United",1,"SFO","7:10p → 4:15p +2","28h 5m",4843,false],
+  ["b","SNA","ICN","United",1,"SFO","7:45a → 4:15p +1","15h 30m",4879,false],
+  ["b","ONT","NRT","United",2,"SFO, LAX","6:27p → 3:55p +2","28h 28m",3917,false],
+  ["b","ONT","HND","American",1,"DFW","7:00a → 6:25p +1","18h 25m",3982,false],
+  ["b","ONT","ICN","Alaska / Philippine Airlines",2,"HNL, MNL","7:20a → 6:05a +3","53h 45m",4394,false],
+  ["b","ONT","ICN","Delta",1,"SEA","11:59a → 5:45p +2","36h 46m",4789,false],
+  ["b","ONT","ICN","United",1,"SFO","6:27p → 4:15p +2","28h 48m",4843,false]
+].map(row);
+
+// Rows pasted from Google Flights as price|stops|airline|outbound|duration|layover cities|MIX (MIX = part of the trip is in another cabin)
+const VIA = { Honolulu: "HNL", Guam: "GUM", Seoul: "ICN", "Taipei City": "TPE", "Hong Kong": "HKG", Manila: "MNL", Seattle: "SEA", "San Francisco": "SFO", Vancouver: "YVR", Dallas: "DFW", "Salt Lake City": "SLC", "Los Angeles": "LAX", "Las Vegas": "LAS", Guangzhou: "CAN", Calgary: "YYC", Nadi: "NAN", Tokyo: "Tokyo", Portland: "PDX", Phoenix: "PHX", Helsinki: "HEL" };
+const X = (dk, from, to, raw) => raw.trim().split("\n").map(l => {
+  const [p, s, al, tm, du, via, mx] = l.split("|");
+  return [dk, from, to, al.replace(/\. Operated.*$/, "").replace(/\b(Asiana|Philippine|Singapore|STARLUX) Airlines/g, "$1").replace(/ and /g, " / "),
+    +s, via.split(",").filter(Boolean).map(v => VIA[v] || v).join(", "), tm.replace(">", " → ").replace(/\+(\d)/, " +$1"), du, +p, mx !== "MIX"];
+});
+const build = (...groups) => groups.flat().map(row);
+
+const SPRING_ECO = build(
+  X("a","LAX","TYO",`
+1012|1|Cathay Pacific|10:20p>2:05p+2|23h 45m|Hong Kong|
+1027|1|Cathay Pacific|10:20p>9:15p+2|30h 55m|Hong Kong|
+1068|1|Cathay Pacific|10:20p>1:10p+2|22h 50m|Hong Kong|
+1229|1|Cathay Pacific|11:45p>1:10p+2|21h 25m|Hong Kong|
+1191|1|EVA Air|12:30a>8:20p+1|27h 50m||
+1678|0|JAL|12:55p>4:40p+1|11h 45m||
+1725|0|Singapore Airlines|1:45p>5:40p+1|11h 55m||`),
+  X("a","LAX","KIX",`
+1030|1|Cathay Pacific|10:20p>3:10p+2|24h 50m|Hong Kong|
+1053|2|Cathay Pacific|11:45p>2:45p+2|23h|Hong Kong,Taipei City|
+1068|1|Cathay Pacific|10:20p>12:45p+2|22h 25m|Hong Kong|
+1068|1|Cathay Pacific|12:05p>6:20a+2|26h 15m|Hong Kong|
+1168|1|Cathay Pacific|11:45p>3:10p+2|23h 25m|Hong Kong|
+1074|1|Asiana Airlines|10:00a>9:45a+2|31h 45m||`),
+  X("a","LAX","ICN",`
+906|1|Cathay Pacific|12:05p>12:40a+2|20h 35m|Hong Kong|
+906|1|Cathay Pacific|10:20p>12:45p+2|22h 25m|Hong Kong|
+906|1|Cathay Pacific|11:45p>9:25p+2|29h 40m|Hong Kong|
+946|0|Asiana Airlines|10:00a>3:35p+1|13h 35m||
+1011|1|Delta and Korean Air|9:35a>5:40p+1|16h 5m|San Francisco|
+1006|0|Korean Air|12:00p>5:35p+1|13h 35m||`),
+  X("b","LAX","TYO",`
+1077|1|Cathay Pacific|12:05p>6:30a+2|26h 25m|Hong Kong|
+1419|0|ANA|5:00p>9:05p+1|12h 5m||
+1548|0|JAL|1:35p>5:35p+1|12h||`),
+  X("b","LAX","KIX",`
+1080|1|Cathay Pacific|12:05p>6:20a+2|26h 15m|Hong Kong|
+2034|0|JAL|2:35p>7:10p+1|12h 35m||`),
+  X("b","LAX","ICN",`
+956|1|Cathay Pacific|12:05p>12:40a+2|20h 35m|Hong Kong|
+1037|0|Asiana Airlines|11:50p>4:50a+2|13h||
+1056|0|Korean Air|10:00p>3:00a+2|13h||`),
+  X("c","LAX","TYO",`
+1188|0|ZIPAIR Tokyo|10:40a>2:25p+1|11h 45m||
+1894|0|Singapore Airlines|1:45p>5:40p+1|11h 55m||`),
+  X("c","LAX","KIX",`
+1172|1|China Airlines|11:40p>11:35a+2|19h 55m|Taipei City|
+1193|1|STARLUX Airlines|11:50p>11:10a+2|19h 20m|Taipei City|
+2752|0|JAL|2:35p>7:10p+1|12h 35m||`),
+  X("c","LAX","ICN",`
+994|0|Asiana Airlines|10:00a>3:35p+1|13h 35m||`),
+  X("a","SAN","TYO",`
+1970|1|United and ANA|7:15a>3:25p+1|16h 10m|San Francisco|
+2564|0|JAL|12:40p>4:40p+1|12h||`),
+  X("a","SAN","ICN",`
+1342|1|Delta and Korean Air|6:50a>3:55p+1|17h 5m|Seattle|
+1432|1|United|6:20a>4:15p+1|17h 55m|San Francisco|`),
+  X("a","SNA","TYO",`
+2225|1|Alaska|8:02a>3:25p+1|15h 23m|Seattle|`),
+  X("a","SNA","ICN",`
+1022|1|Delta and Korean Air|7:15a>3:55p+1|16h 40m|Seattle|
+1022|1|Delta and Korean Air|7:05p>4:20a+2|17h 15m|Seattle|
+1399|1|Delta|7:15a>5:45p+1|18h 30m|Seattle|
+1428|2|Alaska and EVA Air|7:13p>10:30a+2|23h 17m|Seattle,Taipei City|
+1598|1|United|7:20a>4:15p+1|16h 55m|San Francisco|`),
+  X("a","ONT","TYO",`
+1267|1|China Airlines|11:50p>10:15p+2|30h 25m||
+1362|1|STARLUX Airlines|10:45p>12:35p+2|21h 50m|Taipei City|`),
+  X("a","ONT","ICN",`
+1022|1|Delta and Korean Air|7:00a>3:55p+1|16h 55m|Seattle|
+1156|1|China Airlines|11:50p>11:20a+2|19h 30m|Taipei City|`)
+);
+
+const SPRING_PE = build(
+  X("a","LAX","TYO",`
+1969|1|Philippine Airlines|12:10p>12:50p+2|32h 40m|Manila|MIX
+2312|1|EVA Air|12:30a>12:00p+1|19h 30m|Taipei City|MIX
+4048|0|JAL|12:55p>4:40p+1|11h 45m||
+4162|0|ANA|12:30p>4:30p+1|12h||`),
+  X("a","LAX","KIX",`
+2277|1|EVA Air|12:30a>11:55a+1|19h 25m|Taipei City|MIX
+2688|1|China Airlines|11:40p>11:35a+2|19h 55m|Taipei City|MIX`),
+  X("a","LAX","ICN",`
+2255|1|EVA Air|12:30a>10:30a+1|18h|Taipei City|MIX
+2814|0|Air Premia|10:50a>4:20p+1|13h 30m||`),
+  X("b","LAX","TYO",`
+1919|1|Philippine Airlines|12:10p>12:50p+2|32h 40m|Manila|MIX
+3138|1|Alaska and JAL|9:25a>4:00p+1|14h 35m|San Francisco|MIX
+3144|0|JAL|12:55p>4:40p+1|11h 45m||
+3409|0|ANA|5:00p>9:05p+1|12h 5m||`),
+  X("b","LAX","KIX",`
+2315|1|EVA Air|12:30a>4:55p+1|24h 25m|Taipei City|MIX
+5054|0|JAL|2:35p>7:10p+1|12h 35m||`),
+  X("b","LAX","ICN",`
+2272|1|Philippine Airlines|12:10p>6:05a+2|25h 55m|Manila|MIX
+3319|0|Air Premia|10:50a>4:20p+1|13h 30m||`),
+  X("c","LAX","TYO",`
+1869|1|Philippine Airlines|12:10p>12:50p+2|32h 40m|Manila|MIX
+1869|1|Philippine Airlines|12:10p>2:10p+2|34h|Manila|MIX
+2312|1|EVA Air|12:05a>12:00p+1|19h 55m|Taipei City|MIX
+2312|1|EVA Air|12:30a>12:55p+1|20h 25m|Taipei City|MIX
+2380|1|Cathay Pacific|10:20p>1:10p+2|22h 50m|Hong Kong|
+4518|0|JAL|1:35p>5:35p+1|12h||
+4584|0|United|12:05p>3:55p+1|11h 50m||`),
+  X("c","LAX","KIX",`
+2041|1|China Airlines|11:40p>11:35a+2|19h 55m|Taipei City|MIX
+2311|1|Philippine Airlines|12:10p>1:45p+2|33h 35m|Manila|MIX
+2315|1|EVA Air|12:30a>11:55a+1|19h 25m|Taipei City|MIX
+2383|1|Cathay Pacific|10:20p>12:45p+2|22h 25m|Hong Kong|
+5288|0|JAL|2:35p>7:10p+1|12h 35m||`),
+  X("c","LAX","ICN",`
+2042|1|China Airlines|11:40p>11:20a+2|19h 40m|Taipei City|MIX
+2222|1|Philippine Airlines|12:10p>6:05a+2|25h 55m|Manila|MIX
+2292|1|EVA Air|12:30a>10:30a+1|18h|Taipei City|MIX
+2359|1|Cathay Pacific|12:05p>12:40a+2|20h 35m|Hong Kong|MIX
+2359|1|Cathay Pacific|11:45p>12:45p+2|21h|Hong Kong|MIX
+2594|0|Air Premia|10:50a>4:20p+1|13h 30m||`),
+  X("c","SAN","TYO",`
+3545|1|American|7:44a>6:25p+1|18h 41m|Dallas|MIX`),
+  X("c","SAN","ICN",`
+2553|1|Delta|6:55p>5:45p+2|30h 50m|Seattle|MIX`),
+  X("c","SNA","TYO",`
+3628|1|Alaska and JAL|8:59a>3:30p+1|14h 31m|Seattle|MIX`),
+  X("c","SNA","ICN",`
+2258|1|Delta|7:05p>5:45p+2|30h 40m|Seattle|MIX
+2430|2|Alaska and China Airlines|7:59p>11:20a+2|23h 21m|San Francisco,Taipei City|MIX
+2735|1|American|6:39p>4:25p+2|29h 46m|Dallas|MIX
+2814|1|Delta|7:05p>4:20p+2|29h 15m|Salt Lake City|MIX
+2898|1|Delta|7:15a>5:45p+1|18h 30m|Seattle|MIX`),
+  X("c","ONT","TYO",`
+2475|1|China Airlines|11:50p>6:30p+2|26h 40m|Taipei City|MIX`),
+  X("c","ONT","ICN",`
+2258|1|Delta|5:47p>5:45p+2|31h 58m|Seattle|MIX`)
+);
+
+const SPRING_BUS = build(
+  X("a","LAX","TYO",`
+3719|1|Asiana Airlines|10:00a>8:20p+1|18h 20m|Seoul|
+3719|1|Asiana Airlines|11:50p>11:20a+2|19h 30m|Seoul|
+6214|1|Asiana Airlines and Korean Air|11:50p>12:25p+2|20h 35m|Seoul|
+10320|0|JAL|12:55p>4:40p+1|11h 45m||
+11198|0|American|10:40a>3:05p+1|12h 25m||
+11198|0|American|12:45a>5:05a+1|12h 20m||`),
+  X("a","LAX","KIX",`
+3722|1|Asiana Airlines|10:00a>6:30p+1|16h 30m|Seoul|
+3722|1|Asiana Airlines|11:50p>9:15a+2|17h 25m|Seoul|
+3957|1|Asiana Airlines and Korean Air|10:00a>10:40p+1|20h 40m|Seoul|`),
+  X("a","LAX","ICN",`
+5512|1|China Southern|11:00p>1:15p+2|22h 15m|Guangzhou|
+6521|0|Asiana Airlines|10:00a>3:35p+1|13h 35m||
+6521|0|Asiana Airlines|11:50p>4:50a+2|13h||`),
+  X("b","LAX","TYO",`
+3719|1|Asiana Airlines|11:50p>11:20a+2|19h 30m|Seoul|
+8426|0|United|12:05p>3:55p+1|11h 50m||
+8565|0|ANA|12:30p>4:30p+1|12h||`),
+  X("b","LAX","KIX",`
+3722|1|Asiana Airlines|10:00a>6:30p+1|16h 30m|Seoul|
+9425|0|JAL|2:35p>7:10p+1|12h 35m||`),
+  X("b","LAX","ICN",`
+5917|1|China Southern|11:00p>1:15p+2|22h 15m|Guangzhou|
+6663|0|Asiana Airlines|10:00a>3:35p+1|13h 35m||`),
+  X("c","LAX","TYO",`
+3719|1|Asiana Airlines|11:50p>11:20a+2|19h 30m|Seoul|
+10631|0|JAL|12:55p>4:40p+1|11h 45m||`),
+  X("c","LAX","KIX",`
+3722|1|Asiana Airlines|10:00a>6:30p+1|16h 30m|Seoul|
+11752|0|JAL|2:35p>7:10p+1|12h 35m||`),
+  X("c","LAX","ICN",`
+5847|1|China Southern|11:00p>1:15p+2|22h 15m|Guangzhou|
+6663|0|Asiana Airlines|10:00a>3:35p+1|13h 35m||`),
+  X("a","SAN","TYO",`
+8424|2|Alaska and Air Canada|6:15a>4:40p+1|18h 25m|Seattle,Vancouver|MIX`),
+  X("a","SNA","TYO",`
+6416|2|Alaska and EVA Air|7:13p>12:55p+2|25h 42m|Seattle,Taipei City|MIX`)
+);
+
+const SUMMER_ECO = build(
+  X("a","LAX","TYO",`
+1074|0|ZIPAIR Tokyo|10:25a>2:10p+1|11h 45m||
+1197|1|Cathay Pacific|1:25a>2:30p+1|21h 5m|Hong Kong|
+1209|0|United|11:00a>2:15p+1|11h 15m||
+1209|0|ANA|12:45p>4:30p+1|11h 45m||`),
+  X("a","LAX","KIX",`
+1200|1|Korean Air|12:30p>9:00p+1|16h 30m|Seoul|
+1285|1|Cathay Pacific|1:25a>3:10p+1|21h 45m|Hong Kong|
+1501|0|United|3:10p>6:50p+1|11h 40m||`),
+  X("a","LAX","ICN",`
+1288|1|Cathay Pacific|1:25a>12:40p+1|19h 15m|Hong Kong|
+1519|0|Air Premia|10:50a>3:50p+1|13h||
+1836|0|Asiana Airlines|10:10a>3:20p+1|13h 10m||`),
+  X("b","LAX","TYO",`
+1074|0|ZIPAIR Tokyo|10:25a>2:10p+1|11h 45m||
+1259|0|ANA|12:45p>4:30p+1|11h 45m||`),
+  X("b","LAX","KIX",`
+1249|1|Korean Air|12:30p>9:00p+1|16h 30m|Seoul|
+1654|0|United|3:10p>6:50p+1|11h 40m||`),
+  X("b","LAX","ICN",`
+1161|1|Cathay Pacific|1:20p>12:40p+2|31h 20m|Hong Kong|
+1519|0|Air Premia|10:50a>3:50p+1|13h||`),
+  X("c","LAX","TYO",`
+1073|0|ZIPAIR Tokyo|11:00a>2:10p+1|11h 10m||
+1149|0|Singapore Airlines|2:20p>5:50p+1|11h 30m||
+1259|0|Delta|10:40a>2:00p+1|11h 20m||`),
+  X("c","LAX","KIX",`
+1241|1|Cathay Pacific|1:25a>12:55p+1|19h 30m|Hong Kong|
+1281|1|Korean Air|1:00p>9:00p+1|16h|Seoul|
+1566|0|United|3:10p>6:50p+1|11h 40m||`),
+  X("c","LAX","ICN",`
+1014|0|Air Premia|10:50a>3:50p+1|13h||
+1026|1|Cathay Pacific|1:25a>12:40p+1|19h 15m|Hong Kong|
+1330|0|Asiana Airlines|10:40a>3:20p+1|12h 40m||`),
+  X("d","LAX","TYO",`
+1009|0|ZIPAIR Tokyo|11:00a>2:10p+1|11h 10m||
+1079|0|Singapore Airlines|2:20p>5:50p+1|11h 30m||
+1236|0|JAL|1:30p>4:30p+1|11h||
+1236|0|United|11:00a>2:15p+1|11h 15m||
+1236|0|ANA|1:10p>4:30p+1|11h 20m||`),
+  X("d","LAX","KIX",`
+1267|1|Asiana Airlines and Korean Air|10:40a>9:00p+1|18h 20m|Seoul|
+1267|1|Asiana Airlines and Korean Air|11:30p>9:00p+2|29h 30m|Seoul|
+1295|1|Korean Air|1:00p>9:00p+1|16h|Seoul|
+1295|1|Korean Air|11:50p>11:20a+2|19h 30m|Seoul|
+1347|1|Cathay Pacific|1:25a>12:55p+1|19h 30m|Hong Kong|
+1547|0|United|3:10p>6:50p+1|11h 40m||`),
+  X("d","LAX","ICN",`
+994|0|Air Premia|10:50a>3:50p+1|13h||
+1107|1|Cathay Pacific|1:25a>12:40p+1|19h 15m|Hong Kong|
+1210|0|Asiana Airlines|10:40a>3:20p+1|12h 40m||
+1210|0|Asiana Airlines|11:30p>4:30a+2|13h||
+1866|0|Korean Air|1:00p>5:50p+1|12h 50m||`),
+  X("d","SAN","TYO",`
+1162|1|Delta|6:50a>4:20p+1|17h 30m|Seattle|
+1162|1|Delta|6:15a>2:00p+1|15h 45m|Los Angeles|
+1162|1|Delta|6:50a>2:20p+1|15h 30m|Seattle|
+1495|1|Alaska and JAL|9:00a>3:05p+1|14h 5m|San Francisco|
+1501|1|United and ANA|9:45a>3:25p+1|13h 40m|San Francisco|
+1722|0|JAL|1:35p>4:45p+1|11h 10m||`),
+  X("d","SAN","ICN",`
+1229|1|Air Canada|8:30a>4:05p+1|15h 35m|Vancouver|
+1261|1|Delta and Korean Air|10:00a>5:50p+1|15h 50m|Los Angeles|`),
+  X("d","SNA","TYO",`
+1258|2|Alaska and Cathay Pacific|7:59p>1:40p+2|25h 41m|San Francisco,Hong Kong|
+1462|1|Delta|7:15a>2:20p+1|15h 5m|Seattle|`),
+  X("d","SNA","ICN",`
+1237|2|Alaska and Cathay Pacific|8:02a>10:25p+1|22h 23m|Seattle,Hong Kong|
+1879|1|Delta|7:00a>3:20p+1|16h 20m|Salt Lake City|`),
+  X("d","ONT","TYO",`
+1457|2|Alaska and JAL|7:00a>3:55p+1|16h 55m|Portland,Vancouver|
+1574|1|Alaska|6:00a>4:00p+1|18h|Seattle|`),
+  X("d","ONT","ICN",`
+1639|1|China Airlines|12:55a>11:30a+1|18h 35m|Taipei City|
+1734|1|American|11:59p>3:45p+2|23h 46m|Dallas|`)
+);
+
+const SUMMER_PE = build(
+  X("a","LAX","TYO",`
+2353|1|Philippine Airlines|12:55p>1:40p+2|32h 45m|Manila|MIX
+2512|1|Alaska and JAL|9:00a>3:30p+1|14h 30m|Seattle|MIX
+2517|0|JAL|1:05p>4:35p+1|11h 30m||
+2643|0|United|11:00a>2:15p+1|11h 15m||`),
+  X("a","LAX","KIX",`
+2661|0|United|3:10p>6:50p+1|11h 40m||
+2667|1|American and JAL|12:50a>8:35a+1|15h 45m|Tokyo|MIX`),
+  X("a","LAX","ICN",`
+2622|1|China Airlines|12:05a>11:30a+1|19h 25m|Taipei City|MIX
+2884|0|Air Premia|10:50a>3:50p+1|13h||`),
+  X("b","LAX","TYO",`
+2400|1|Cathay Pacific|1:25a>1:40p+1|20h 15m|Hong Kong|
+2578|0|JAL|1:05p>4:35p+1|11h 30m||
+2708|0|ANA|12:45p>4:30p+1|11h 45m||`),
+  X("b","LAX","KIX",`
+2403|1|Cathay Pacific|1:25a>12:55p+1|19h 30m|Hong Kong|MIX
+3151|0|United|3:10p>6:50p+1|11h 40m||`),
+  X("b","LAX","ICN",`
+2379|1|Cathay Pacific|1:25a>12:40p+1|19h 15m|Hong Kong|MIX
+2884|0|Air Premia|10:50a>3:50p+1|13h||`),
+  X("c","LAX","TYO",`
+2133|1|Philippine Airlines|12:55p>1:00p+2|32h 5m|Manila|MIX
+2578|0|JAL|1:30p>4:30p+1|11h||
+2718|0|American|12:50a>4:45a+1|11h 55m||`),
+  X("c","LAX","KIX",`
+2722|1|United|10:35p>2:50p+2|24h 15m|San Francisco|MIX
+2726|0|United|3:10p>6:50p+1|11h 40m||`),
+  X("c","LAX","ICN",`
+2084|0|Air Premia|10:50a>3:50p+1|13h||
+2412|1|Philippine Airlines|12:55p>5:55a+2|25h|Manila|MIX
+2584|1|EVA Air|1:15a>11:00a+1|17h 45m|Taipei City|MIX`),
+  X("d","LAX","TYO",`
+2083|1|Philippine Airlines|12:55p>1:40p+2|32h 45m|Manila|MIX
+2350|1|Cathay Pacific|1:25a>1:40p+1|20h 15m|Hong Kong|
+2368|1|EVA Air|1:15a>8:20p+1|27h 5m||MIX
+2398|1|STARLUX Airlines|12:35a>12:55p+1|20h 20m|Taipei City|
+2559|1|Alaska and JAL|9:00a>3:30p+1|14h 30m|Seattle|MIX
+2564|0|JAL|1:30p>4:30p+1|11h||
+2647|0|Delta|10:40a>2:00p+1|11h 20m||`),
+  X("d","LAX","KIX",`
+2353|1|Cathay Pacific|1:25a>12:55p+1|19h 30m|Hong Kong|MIX
+2371|1|EVA Air|12:50a>10:10a+1|17h 20m|Taipei City|MIX
+2441|1|Philippine Airlines|12:55p>2:10p+2|33h 15m|Manila|MIX
+2668|0|United|3:10p>6:50p+1|11h 40m||
+2672|1|United|7:15a>2:50p+1|15h 35m|San Francisco|MIX`),
+  X("d","LAX","ICN",`
+2214|0|Air Premia|10:50a>3:50p+1|13h||
+2327|1|China Airlines|12:55a>11:30a+1|18h 35m|Taipei City|MIX
+2329|1|Cathay Pacific|1:25a>12:40p+1|19h 15m|Hong Kong|MIX
+2349|1|EVA Air|1:15a>11:00a+1|17h 45m|Taipei City|MIX
+2362|1|Philippine Airlines|12:55p>5:55a+2|25h|Manila|MIX
+2753|1|United and Air Canada|8:20a>4:05p+1|15h 45m|Vancouver|MIX`),
+  X("d","SAN","TYO",`
+2492|1|Delta|6:15a>2:00p+1|15h 45m|Los Angeles|MIX
+2936|0|JAL|1:35p>4:45p+1|11h 10m||`),
+  X("d","SAN","ICN",`
+2430|1|Delta|6:15a>3:20p+1|17h 5m|Salt Lake City|MIX`),
+  X("d","SNA","TYO",`
+2616|1|Alaska and JAL|8:02a>3:30p+1|15h 28m|Seattle|MIX`),
+  X("d","SNA","ICN",`
+2622|2|Alaska and China Airlines|7:59p>11:30a+2|23h 31m|San Francisco,Taipei City|MIX`),
+  X("d","ONT","TYO",`
+2367|1|China Airlines|12:55a>1:15p+1|20h 20m|Taipei City|MIX
+2616|1|Alaska and JAL|6:00a>3:30p+1|17h 30m|Seattle|MIX
+2767|1|American|11:59p>2:20p+2|22h 21m|Dallas|MIX
+2807|1|American and JAL|5:44a>3:20p+1|17h 36m|Dallas|MIX
+2819|1|United|8:00a>3:00p+1|15h|San Francisco|MIX`),
+  X("d","ONT","ICN",`
+2769|1|Delta|6:00a>3:20p+1|17h 20m|Salt Lake City|MIX`)
+);
+
+const SUMMER_BUS = build(
+  X("a","LAX","TYO",`
+3982|0|ZIPAIR Tokyo|10:25a>2:10p+1|11h 45m||
+5120|1|Asiana Airlines|10:10a>9:00p+1|18h 50m|Seoul|
+7298|0|JAL|1:05p>4:35p+1|11h 30m||`),
+  X("a","LAX","KIX",`
+4742|1|Philippine Airlines|11:00p>7:35p+2|28h 35m|Manila|
+5123|1|Asiana Airlines|10:10a>6:30p+1|16h 20m|Seoul|
+7918|0|United|3:10p>6:50p+1|11h 40m||`),
+  X("a","LAX","ICN",`
+5308|1|Philippine Airlines|12:55p>5:55a+2|25h|Manila|
+6806|0|Asiana Airlines|10:10a>3:20p+1|13h 10m||`),
+  X("b","LAX","TYO",`
+3982|0|ZIPAIR Tokyo|10:25a>2:10p+1|11h 45m||
+4739|1|Philippine Airlines|12:55p>1:00p+2|32h 5m|Manila|
+7904|0|United|11:00a>2:15p+1|11h 15m||`),
+  X("b","LAX","KIX",`
+4742|1|Philippine Airlines|12:55p>2:10p+2|33h 15m|Manila|
+5123|1|Asiana Airlines|11:30p>9:00a+2|17h 30m|Seoul|`),
+  X("b","LAX","ICN",`
+4718|1|Philippine Airlines|12:55p>5:55a+2|25h|Manila|
+6806|0|Asiana Airlines|10:10a>3:20p+1|13h 10m||`),
+  X("c","LAX","TYO",`
+3832|0|ZIPAIR Tokyo|11:00a>2:10p+1|11h 10m||
+4739|1|Philippine Airlines|11:00p>1:00p+2|22h|Manila|
+7214|0|American|12:50a>4:45a+1|11h 55m||`),
+  X("c","LAX","KIX",`
+4742|1|Philippine Airlines|11:00p>2:10p+2|23h 10m|Manila|
+5123|1|Asiana Airlines|10:40a>6:30p+1|15h 50m|Seoul|`),
+  X("c","LAX","ICN",`
+5308|1|Philippine Airlines|12:55p>5:55a+2|25h|Manila|
+6806|0|Asiana Airlines|10:40a>3:20p+1|12h 40m||`),
+  X("d","LAX","TYO",`
+3484|0|ZIPAIR Tokyo|11:00a>2:10p+1|11h 10m||
+6355|0|JAL|1:30p>4:30p+1|11h||
+4639|1|Philippine Airlines|11:00p>1:40p+2|22h 40m|Manila|
+4978|1|Asiana Airlines|10:40a>9:00p+1|18h 20m|Seoul|
+6804|0|ANA|1:10p>4:30p+1|11h 20m||
+6804|0|United|11:00a>2:15p+1|11h 15m||`),
+  X("d","LAX","KIX",`
+4642|1|Philippine Airlines|11:00p>2:10p+2|23h 10m|Manila|
+4981|1|Asiana Airlines|10:40a>6:30p+1|15h 50m|Seoul|
+6818|0|United|3:10p>6:50p+1|11h 40m||`),
+  X("d","LAX","ICN",`
+4618|1|Philippine Airlines|12:55p>5:55a+2|25h|Manila|
+5861|1|China Airlines|12:55a>11:30a+1|18h 35m|Taipei City|
+6595|0|Korean Air|11:50p>4:40a+2|12h 50m||
+6663|0|Asiana Airlines|10:40a>3:20p+1|12h 40m||
+6663|0|Asiana Airlines|11:30p>4:30a+2|13h||`),
+  X("d","SAN","TYO",`
+5383|1|WestJet|3:30p>4:20p+2|32h 50m|Calgary|MIX
+6634|0|JAL|1:35p>4:45p+1|11h 10m||`),
+  X("d","SAN","ICN",`
+5621|1|Alaska and Korean Air|7:35a>4:40p+1|17h 5m|Seattle|MIX`),
+  X("d","SNA","TYO",`
+6133|2|Alaska and Cathay Pacific|7:59p>1:40p+2|25h 41m|San Francisco,Hong Kong|MIX`),
+  X("d","ONT","TYO",`
+5930|1|China Airlines|12:55a>1:15p+1|20h 20m|Taipei City|`)
+);
+
+const WINTER_BUS = build(
+  X("a","LAX","TYO",`
+9767|1|Alaska|7:00a>5:15p+1|17h 15m|Honolulu|MIX
+9869|1|Philippine Airlines|10:05p>12:50p+2|21h 45m|Manila|
+10343|1|Asiana Airlines|9:00a>8:20p+1|18h 20m|Seoul|
+11875|0|United|11:05a>3:55p+1|11h 50m||`),
+  X("a","LAX","KIX",`
+9872|1|Philippine Airlines|10:05p>1:45p+2|22h 40m|Manila|
+10006|1|Asiana Airlines|9:00a>6:30p+1|16h 30m|Seoul|`),
+  X("a","LAX","ICN",`
+8568|1|Philippine Airlines|3:10p>6:05a+2|21h 55m|Manila|
+11254|0|Korean Air|11:00a>5:35p+1|13h 35m||`),
+  X("b","LAX","TYO",`
+5505|1|Asiana Airlines|9:00a>8:20p+1|18h 20m|Seoul|
+5547|1|Asiana Airlines and Korean Air|9:00a>7:30p+1|17h 30m|Seoul|
+9549|0|American|12:05a>5:05a+1|12h||
+9549|0|American|9:55a>3:05p+1|12h 10m||`),
+  X("b","LAX","KIX",`
+6563|1|Asiana Airlines|11:50p>9:15a+2|16h 25m|Seoul|
+8175|1|China Airlines|10:40p>11:35a+2|19h 55m|Taipei City|
+9564|0|JAL|1:30p>7:10p+1|12h 40m||`),
+  X("b","LAX","ICN",`
+7964|0|Korean Air|10:00p>4:20a+2|13h 20m||
+7186|0|Asiana Airlines|9:00a>3:35p+1|13h 35m||
+7186|0|Asiana Airlines|11:50p>6:10a+2|13h 20m||`),
+  X("c","LAX","TYO",`
+7180|1|Fiji Airways|10:35p>6:35a+3|39h|Nadi|
+8965|1|EVA Air|11:00p>12:00p+2|20h|Taipei City|
+10075|0|United|11:05a>3:55p+1|11h 50m||`),
+  X("c","LAX","KIX",`
+8968|1|EVA Air|11:00p>11:55a+2|19h 55m|Taipei City|
+9042|1|Asiana Airlines|9:00a>6:30p+1|16h 30m|Seoul|`),
+  X("c","LAX","ICN",`
+7818|1|Philippine Airlines|11:10a>6:05a+2|25h 55m|Manila|
+10494|0|Korean Air|11:00a>5:35p+1|13h 35m||`),
+  X("b","SAN","TYO",`
+8244|1|Air Canada|5:00p>4:40p+2|30h 40m|Vancouver|
+13123|0|JAL|11:45a>4:45p+1|12h||`),
+  X("b","SAN","ICN",`
+9122|1|Alaska and Korean Air|5:01p>5:10a+2|19h 9m|Las Vegas|MIX`)
+);
+
+const COVER = {
+  std: "LAX to Tokyo, Osaka and Seoul on every date pair. SAN, SNA and ONT to Tokyo and Seoul on one date pair.",
+  busLight: "LAX to Tokyo, Osaka and Seoul on every date pair. Other airports were only spot-checked because the LAX fares are already so far over budget."
+};
+const BUDGET_NOTE = "<strong>Price is the lowest round trip for that outbound flight.</strong> The return flight you choose can raise it.";
+
+// pick = [tag, price, to, from, note]
+const DATA = {
+  winter: {
+    eco: {
+      rows: ECO,
+      note: "LAX nonstops are the easiest trips, and JAL now flies SAN → Narita nonstop. Leaving Dec 20 or Dec 22 is cheaper than Dec 18.",
+      picks: [["Cheapest nonstop to Japan", 2294, "HND"], ["Cheapest nonstop to Korea", 2444, "ICN"], ["Cheap with a short connection", 2184, "NRT"], ["Lowest price overall", 1848, "TYO", "LAX", "United, two stops via Honolulu and Guam. A long trip"]],
+      notes: [
+        BUDGET_NOTE,
+        "<strong>You land the next day</strong> because you cross the date line. Every trip here is still 11 days or longer.",
+        "<strong>Leaving Dec 20 or Dec 22 is cheaper.</strong> Nonstops to Tokyo cost $700 – $1,000 less than on Dec 18, and Osaka via Seoul starts at $2,022 on Dec 20.",
+        "<strong>LAX and SAN have nonstops.</strong> JAL flies SAN → Narita nonstop for $3,082. SAN, SNA and ONT were searched for Dec 18 – Jan 2 only.",
+        "<strong>SNA → Tokyo is now over budget,</strong> starting at $4,249. Turn off “Under $4,000” to see it. SNA → Seoul still starts at $3,418."
+      ]
+    },
+    pe: {
+      rows: PE,
+      note: "Most cheap premium economy fares put at least one flight in plain economy. The first two picks are premium economy on every flight.",
+      picks: [["Best premium economy nonstop", 3279, "HND", "LAX", "ANA. Premium economy on every flight"], ["Cheapest full premium economy to Korea", 2827, "ICN", "LAX", "Premium economy on every flight, but a long trip via Helsinki"], ["Cheapest to Japan", 2830, "NRT", "SNA", "Part of the trip is in economy"], ["Cheap from LAX", 2917, "TYO", "LAX", "Part of the trip is in economy"]],
+      notes: [
+        "<strong>“Part economy” fares</strong> have at least one flight in plain economy. Often that's a short connection, like LAX to SFO, but on some it's a long flight. Check which flight is economy in Google Flights before you book.",
+        BUDGET_NOTE,
+        "<strong>Dec 22 – Jan 2 is the only window with premium economy nonstops under $4,000.</strong> ANA's nonstop to Haneda is $3,279, JAL's to Narita is $3,383 and United's to Narita is $3,748. ANA's and United's other nonstops are $3,975 – $3,979. On Dec 18 the cheapest is ANA at $4,029.",
+        "<strong>Searched:</strong> LAX for all three date pairs. SAN, SNA and ONT for Dec 20 – 31, plus SAN to Tokyo for Dec 22 – Jan 2."
+      ]
+    },
+    bus: {
+      rows: WINTER_BUS,
+      note: "Nothing is under $4,000. The cheapest business fare is $5,505, and the cheapest nonstop is $7,186.",
+      picks: [["Cheapest business fare", 5505, "TYO", "LAX", "Asiana via Seoul. $1,505 over budget"], ["Cheapest nonstop to Korea", 7186, "ICN", "LAX", "Asiana, Dec 20 – 31"], ["Cheapest to Osaka", 6563, "KIX", "LAX", "Asiana via Seoul"], ["Best nonstop to Tokyo", 9549, "TYO", "LAX", "American, Dec 20 – 31"]],
+      notes: [
+        "<strong>Nothing is under $4,000.</strong> Turn off “Under $4,000” above to see what was found. December business class is priced well above the other seasons.",
+        BUDGET_NOTE,
+        "<strong>Dec 20 – 31 is the cheapest window</strong> for business class. Dec 18 – Jan 2 costs $1,800 to $4,300 more.",
+        "<strong>Business the whole way:</strong> the Asiana fares via Seoul were not flagged as mixed, but check each leg in Google Flights. Fares marked “Part economy” include at least one economy flight.",
+        "<strong>Searched:</strong> LAX to Tokyo, Osaka and Seoul on all three date pairs. SAN to Tokyo and Seoul on Dec 20 – 31. SNA and ONT were not searched, since every LAX fare was far over budget."
+      ]
+    }
+  },
+  spring: {
+    eco: {
+      rows: SPRING_ECO,
+      note: "Spring economy is the cheapest of the year: round trips start around $900. Nonstops to Tokyo start at $1,188.",
+      picks: [["Lowest price overall", 906, "ICN", "LAX", "Cathay Pacific via Hong Kong, Mar 19 – 25"], ["Cheapest nonstop to Korea", 946, "ICN", "LAX", "Asiana, Mar 19 – 25"], ["Cheapest nonstop to Japan", 1188, "TYO", "LAX", "ZIPAIR, a low-cost airline. Bags and meals cost extra"], ["Cheapest to Osaka", 1030, "KIX", "LAX", "Cathay Pacific via Hong Kong"]],
+      notes: [
+        BUDGET_NOTE,
+        "<strong>Every fare is far under $4,000.</strong> Nonstops on full-service airlines: ANA, JAL and Singapore Airlines to Tokyo from $1,419, Asiana and Korean Air to Seoul from $946.",
+        "<strong>Cheapest dates:</strong> Mar 19 – 25 for Seoul and Osaka, Mar 21 – 27 for Tokyo nonstops. Mar 20 – 27 is slightly higher.",
+        "<strong>Osaka has no nonstop from LAX</strong> except JAL on Mar 20 – 27 and 21 – 27 ($2,034 and up).",
+        "<strong>Searched:</strong> " + COVER.std + " Non-LAX airports were searched for Mar 19 – 25."
+      ]
+    },
+    pe: {
+      rows: SPRING_PE,
+      note: "Premium economy nonstops to Tokyo start at $3,144 (JAL, Mar 20 – 27). Seoul is cheaper at $2,594 on Air Premia.",
+      picks: [["Best premium economy nonstop to Tokyo", 3144, "TYO", "LAX", "JAL, Mar 20 – 27. Premium economy on every flight"], ["Cheapest full premium economy to Seoul", 2594, "ICN", "LAX", "Air Premia nonstop, Mar 21 – 27"], ["Cheapest full premium economy to Osaka", 2383, "KIX", "LAX", "Cathay Pacific via Hong Kong, Mar 21 – 27"], ["Lowest price overall", 1869, "TYO", "LAX", "Philippine Airlines via Manila. Part of the trip is in economy"]],
+      notes: [
+        "<strong>“Part economy” fares</strong> have at least one flight in plain economy. Check which one in Google Flights before you book.",
+        BUDGET_NOTE,
+        "<strong>Nonstops are the expensive part.</strong> JAL, ANA and United to Tokyo run $3,144 – $4,584 depending on the date, and JAL to Osaka is $5,054 or more.",
+        "<strong>Seoul is the bargain:</strong> Air Premia is nonstop and premium economy the whole way for $2,594 – $3,319.",
+        "<strong>Searched:</strong> " + COVER.std + " Non-LAX airports were searched for Mar 21 – 27. None had a premium economy fare the whole way."
+      ]
+    },
+    bus: {
+      rows: SPRING_BUS,
+      note: "Asiana business via Seoul is under budget: $3,719 to Tokyo and $3,722 to Osaka. Seoul itself and every nonstop to Japan are over.",
+      picks: [["Cheapest to Tokyo", 3719, "TYO", "LAX", "Asiana via Seoul. Every date pair is the same price"], ["Cheapest to Osaka", 3722, "KIX", "LAX", "Asiana via Seoul"], ["Cheapest to Seoul", 5512, "ICN", "LAX", "China Southern via Guangzhou. $1,512 over budget"], ["Best nonstop to Tokyo", 8426, "TYO", "LAX", "United, Mar 20 – 27. $4,426 over budget"]],
+      notes: [
+        BUDGET_NOTE,
+        "<strong>The two fares under budget</strong> are Asiana flights via Seoul. Google Flights did not flag them as mixed cabin, but open the link and check that both flights show Business.",
+        "<strong>Seoul is more expensive than Tokyo or Osaka</strong> on these dates. Asiana's nonstop to Seoul is $6,521.",
+        "<strong>Nonstops to Japan</strong> are $8,426 or more.",
+        "<strong>Searched:</strong> " + COVER.busLight + " SAN → Tokyo and SNA → Tokyo for Mar 19 – 25 came to $6,416 and up."
+      ]
+    }
+  },
+  summer: {
+    eco: {
+      rows: SUMMER_ECO,
+      note: "Summer economy is also cheap. Nonstop to Seoul on Air Premia is $994, and nonstop to Tokyo starts at $1,009.",
+      picks: [["Cheapest nonstop to Korea", 994, "ICN", "LAX", "Air Premia, Jul 20 – Aug 2"], ["Cheapest nonstop to Tokyo", 1009, "TYO", "LAX", "ZIPAIR, a low-cost airline. Bags and meals cost extra"], ["Cheapest nonstop to Osaka", 1501, "KIX", "LAX", "United, Jun 1 – 11"], ["Cheapest to Osaka with a stop", 1200, "KIX", "LAX", "Korean Air via Seoul"]],
+      notes: [
+        BUDGET_NOTE,
+        "<strong>Every fare is far under $4,000.</strong> United, ANA, JAL and Delta all fly nonstop to Tokyo for $1,200 – $1,260.",
+        "<strong>Jul 20 – Aug 2 and Jul 6 – 16 are cheapest.</strong> Jun 1 – 11 and Jun 15 – 25 cost $70 – $500 more, mostly on Air Premia to Seoul.",
+        "<strong>SAN → Tokyo has a JAL nonstop</strong> for $1,722.",
+        "<strong>Searched:</strong> " + COVER.std + " Non-LAX airports were searched for Jul 20 – Aug 2."
+      ]
+    },
+    pe: {
+      rows: SUMMER_PE,
+      note: "Full premium economy starts at $2,084 to Seoul (Air Premia nonstop) and $2,350 to Tokyo (Cathay Pacific via Hong Kong). All of it is under budget.",
+      picks: [["Cheapest full premium economy to Seoul", 2084, "ICN", "LAX", "Air Premia nonstop, Jul 6 – 16"], ["Cheapest full premium economy to Tokyo", 2350, "TYO", "LAX", "Cathay Pacific via Hong Kong, Jul 20 – Aug 2"], ["Best nonstop to Tokyo", 2517, "TYO", "LAX", "JAL, Jun 1 – 11. Premium economy on every flight"], ["Best nonstop to Osaka", 2661, "KIX", "LAX", "United, Jun 1 – 11"]],
+      notes: [
+        "<strong>“Part economy” fares</strong> have at least one flight in plain economy. The cheapest, $2,083 to Tokyo on Philippine Airlines via Manila, is one of them.",
+        BUDGET_NOTE,
+        "<strong>All dates are close.</strong> Premium economy nonstops to Tokyo are $2,517 – $2,718 on every date pair.",
+        "<strong>Non-LAX airports</strong> had no fare that was premium economy the whole way, except JAL SAN → Narita nonstop for $2,936.",
+        "<strong>Searched:</strong> " + COVER.std + " Non-LAX airports were searched for Jul 20 – Aug 2."
+      ]
+    },
+    bus: {
+      rows: SUMMER_BUS,
+      note: "ZIPAIR nonstop business to Tokyo is under budget on all four date pairs, from $3,484. Everything else is over $4,000.",
+      picks: [["Cheapest business to Tokyo", 3484, "TYO", "LAX", "ZIPAIR nonstop, Jul 20 – Aug 2"], ["Next cheapest date", 3832, "TYO", "LAX", "ZIPAIR nonstop, Jul 6 – 16"], ["Cheapest to Seoul", 4618, "ICN", "LAX", "Philippine Airlines via Manila. $618 over budget"], ["Cheapest to Osaka", 4642, "KIX", "LAX", "Philippine Airlines via Manila. $642 over budget"]],
+      notes: [
+        BUDGET_NOTE,
+        "<strong>ZIPAIR is a low-cost airline.</strong> Its business seats are flat beds, but meals, baggage and seat choice may cost extra, and it only flies LAX → Tokyo Narita.",
+        "<strong>Full-service nonstops to Tokyo</strong> (ANA, United, JAL, American) cost $6,355 – $7,904.",
+        "<strong>Seoul and Osaka</strong> start at about $4,600 – $4,700 on Philippine Airlines via Manila. Asiana via Seoul is $4,978 – $5,123.",
+        "<strong>Searched:</strong> " + COVER.busLight + " SAN, SNA and ONT to Tokyo and SAN to Seoul for Jul 20 – Aug 2 were all $5,383 or more."
+      ]
+    }
+  }
+};
+
+// Google Flights price tracker label for each route and date pair (l = low, t = typical, h = high), read Oct 29, 2026.
+// Google shows no label for premium economy. Keys are FROM + TO + date pair (Tokyo airports count as TYO).
+const TRACK = {
+  "winter-eco": { def: "h" },
+  "spring-eco": { def: "t" },
+  "summer-eco": { def: "t", l: "LAXTYOa LAXKIXa LAXICNa LAXTYOb LAXKIXb LAXICNb" },
+  "winter-bus": { h: "LAXTYOa LAXKIXa LAXICNa LAXICNb LAXTYOc LAXKIXc LAXICNc SANTYOb", t: "LAXTYOb LAXKIXb SANICNb" },
+  "spring-bus": { l: "LAXKIXa LAXKIXb LAXKIXc", t: "LAXTYOa LAXTYOb LAXTYOc SNATYOa", h: "LAXICNa LAXICNb LAXICNc SANTYOa" },
+  "summer-bus": { l: "LAXTYOa LAXTYOb", h: "LAXICNa LAXKIXc LAXICNc ONTTYOd", def: "t" }
+};
+function level(f) {
+  const T = TRACK[state.season + "-" + state.cabin]; if (!T) return "";
+  const k = f.from + (f.to === "HND" || f.to === "NRT" ? "TYO" : f.to) + f.dk;
+  for (const s of ["l", "t", "h"]) if (T[s] && T[s].split(" ").includes(k)) return s;
+  return T.def || "";
+}
+const LV = { l: "low", t: "typical", h: "high" };
+const priceBox = f => { const v = level(f); return v ? `<span class="lv lv-${v}" title="Google says prices for this route and these dates are ${LV[v]}">${money(f.price)}</span>` : money(f.price); };
+
+const money = n => "$" + n.toLocaleString("en-US");
+// Country flag drawn in the page (flag emoji show as letters on Windows)
+const flag = to => DEST[to][1] === "Korea" ? '<svg class="flag" viewBox="0 0 30 20" role="img" aria-label="South Korea"><use href="#f-kr"/></svg>' : '<svg class="flag" viewBox="0 0 30 20" role="img" aria-label="Japan"><use href="#f-jp"/></svg>';
+const stopLabel = s => s === 0 ? "Nonstop" : s === 1 ? "1 stop" : "2 stops";
+const hours = s => parseInt(s, 10);
+const HASHC = { economy: "eco", premium: "pe", business: "bus" };
+
+const state = { season: "winter", cabin: "eco", dest: "all", from: "all", nonstop: false, full: false, budget: true };
+function readHash() {
+  const [s, c] = location.hash.slice(1).toLowerCase().split("-");
+  if (s === "economy" || s === "premium" || s === "business") { state.season = "winter"; state.cabin = HASHC[s]; return true; }
+  if (!SEASONS[s]) return false;
+  state.season = s; if (HASHC[c]) state.cabin = HASHC[c];
+  return true;
+}
+if (!readHash()) {
+  try {
+    const s = localStorage.getItem("season"), c = localStorage.getItem("cabin");
+    if (SEASONS[s]) state.season = s;
+    if (CAB[c]) state.cabin = c;
+  } catch (e) {}
+}
+
+function renderAll() {
+  const S = SEASONS[state.season], C = DATA[state.season][state.cabin], cab = CAB[state.cabin];
+  document.querySelectorAll("#f-season button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === state.season));
+  document.querySelectorAll("#f-cabin button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === state.cabin));
+  document.getElementById("h1").textContent = S.name + " " + cab.name + " to Japan & Korea";
+  document.title = "Fares to Japan & Korea";
+  document.getElementById("lede").textContent = "Round-trip " + cab.name + " fares from Southern California, found on Google Flights on Oct 30, 2026. Prices are per person for 1 adult and include taxes. They change often.";
+  document.getElementById("chips").innerHTML = S.chips.map(t => `<span class="chip">${t}</span>`).join("") + ["LAX · SAN · SNA · ONT", "Under $4,000"].map(t => `<span class="chip">${t}</span>`).join("");
+  document.getElementById("picks-note").textContent = C.note;
+  document.getElementById("full-wrap").hidden = state.cabin === "eco";
+  document.getElementById("full-label").textContent = state.cabin === "bus" ? "Business the whole way" : "Premium economy the whole way";
+  document.getElementById("legend").innerHTML = TRACK[state.season + "-" + state.cabin]
+    ? 'Price color is Google\'s price tracker for that route and those dates: <span class="lv lv-l">low</span> <span class="lv lv-t">typical</span> <span class="lv lv-h">high</span>'
+    : "Google doesn't show its low / typical / high price tracker for premium economy, so these prices aren't color coded.";
+  document.getElementById("notes").innerHTML =C.notes.map(n => `<li>${n}</li>`).join("");
+  document.getElementById("picks").innerHTML = C.picks.map(([tag, p, to, from = "LAX", note]) => {
+    const f = C.rows.find(r => r.price === p && r.to === to && r.from === from);
+    if (!f) return "";
+    return `
+    <div class="pick">
+      <span class="tag">${tag}</span>
+      <span class="route">${flag(f.to)} ${f.from} → ${f.to}</span>
+      <span class="price">${priceBox(f)}</span>
+      <span class="meta">${f.airline} · ${stopLabel(f.stops)}${f.via ? " via " + f.via : ""} · ${f.dur}<br>${S.D[f.dk].label} (${S.D[f.dk].days} days)${note ? "<br>" + note : ""}</span>
+      <a href="${link(f, state.cabin, state.season)}" target="_blank" rel="noopener">Open in Google Flights</a>
+    </div>`;
+  }).join("");
+  render();
+}
+
+function cabinPill(f) {
+  if (state.cabin === "eco") return '<span class="pill eco">Economy</span>';
+  return f.full ? `<span class="pill full">${state.cabin === "bus" ? "Business" : "Premium economy"}</span>` : '<span class="pill mixed">Part economy</span>';
+}
+
+function render() {
+  const S = SEASONS[state.season];
+  const rows = DATA[state.season][state.cabin].rows.filter(f =>
+    (state.dest === "all" || f.country === state.dest) &&
+    (state.from === "all" || f.from === state.from) &&
+    (!state.nonstop || f.stops === 0) &&
+    (state.cabin === "eco" || !state.full || f.full) &&
+    (!state.budget || f.price < 4000)
+  ).sort((a, b) => a.price - b.price);
+  document.getElementById("count").textContent = rows.length + (rows.length === 1 ? " fare" : " fares");
+  const empty = state.budget ? "Nothing under $4,000 matches these filters. Turn off “Under $4,000” to see the cheapest fares that were found." : "No fares match these filters. Try turning off a filter, or switch cabins.";
+  document.getElementById("rows").innerHTML = rows.length ? rows.map(f => `
+    <tr>
+      <td>${S.D[f.dk].label}<div class="sub">${S.D[f.dk].days} days</div></td>
+      <td class="mono">${f.from} → ${f.to}<div class="sub">${flag(f.to)} ${DEST[f.to][0]}</div></td>
+      <td>${f.airline}</td>
+      <td><span class="pill s${f.stops}">${stopLabel(f.stops)}</span>${f.via ? `<div class="sub">via ${f.via}</div>` : ""}</td>
+      <td class="mono">${f.time}<div class="sub">${f.dur}${hours(f.dur) >= 24 ? ' <span class="long">long trip</span>' : ""}</div></td>
+      <td>${cabinPill(f)}</td>
+      <td class="amt">${priceBox(f)}${f.price >= 4000 ? '<div class="overby">over budget</div>' : ""}</td>
+      <td><a href="${link(f, state.cabin, state.season)}" target="_blank" rel="noopener">Search</a></td>
+    </tr>`).join("") : `<tr><td colspan="8" class="empty">${empty}</td></tr>`;
+}
+
+function saveChoice() {
+  try { localStorage.setItem("season", state.season); localStorage.setItem("cabin", state.cabin); } catch (e) {}
+  try { history.replaceState(null, "", "#" + state.season + "-" + CAB[state.cabin].hash); } catch (e) {}
+}
+function seg(id, key, after) {
+  const g = document.getElementById(id);
+  g.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    state[key] = b.dataset.v; (after || render)();
+  });
+}
+seg("f-season", "season", () => { saveChoice(); renderAll(); });
+seg("f-cabin", "cabin", () => { saveChoice(); renderAll(); });
+seg("f-dest", "dest"); seg("f-from", "from");
+window.addEventListener("hashchange", () => { if (readHash()) renderAll(); });
+document.getElementById("f-nonstop").addEventListener("change", e => { state.nonstop = e.target.checked; render(); });
+document.getElementById("f-full").addEventListener("change", e => { state.full = e.target.checked; render(); });
+document.getElementById("f-budget").addEventListener("change", e => { state.budget = e.target.checked; render(); });
+renderAll();
+</script>
+
+
+
+</body></html>
